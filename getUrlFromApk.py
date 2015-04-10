@@ -1,35 +1,20 @@
 #!/usr/bin/env python
 #-*-coding:utf-8-*-
 '''
-author:jaffer tsao
-time:2015-1-29
-function:getUrlFromApk
-
-
-apk反编译---->逐一文件读取---->匹配规则---->存入结果文件中
 '''
-
 import os
 import sys
 import re
-import pdb
-pdb.set_trace()
-#设置递归深度
-sys.setrecursionlimit(1000000)
+import config1
 
-'''
-该类主要是来反编译apk，生成一个目录，里面是反编译之后的内容。
-参数：
-apk_path：这是一个路径，里面有很多apk。 目前先做一个，apk_path目前也加上了name
-返回值：
-暂无，可以设置一个是否反编译成功的指示值。目前不做处理，默认反编译成功。
-'''
 class decompile_apk(object):
 	def __init__(self,apk_path):
 		self.apk_path = apk_path
 
 	def decompile_apk(self):
-		os.system('apktool.jar d '+self.apk_path)
+		#TODO 为什么绝对路径不对？？
+		#os.system('apktool.jar d '+self.apk_path)
+		os.system('apktool.jar d 123.apk')
 
 	#def getApkName(self):
 '''
@@ -46,11 +31,18 @@ class getUrl(object):
 		fp = open(filepath)
 		# 其余的一些url匹配模式暂时就不写
 		match1 = r'http://[a-zA-Z0-9./*#:?%*&=!@\\]+'
+		#匹配IP地址
+		match2 = r'[0-9]+/.[0-9]+/.[0-9]+/.[0-9]+'
 		for line in fp.readlines():
 			y = re.findall(match1,line)
+			x = re.findall(match2,line)
 			if y:
 				#y 也是一个list 下面一个循环是去重
 				for each in y:
+					if self.urllist.count(each) == 0:
+						self.urllist.append(each)
+			if x:
+				for each in x:
 					if self.urllist.count(each) == 0:
 						self.urllist.append(each)
 	
@@ -89,9 +81,10 @@ if __name__=='__main__':
 	save_dir = baseloc + '\\result'
 	de = decompile_apk(apk)
 	de.decompile_apk()
+	#暂停一下，等待编译执行结束
+	#time.sleep(10)
 	path = baseloc + '\\123'
 	get = getUrl(path,save_dir)
 	get.walk_file(path)
 	get.save()
 	raw_input('OK\n')
-
